@@ -36,32 +36,45 @@ Chrom_X=which(allDiff$chromosome_name=='X')
 Chrom_Y=which(allDiff$chromosome_name=='Y')
 Chrom_MT=which(allDiff$chromosome_name=='MT')
 
-totalGenomeLength=3110748599
-Chrom_1_len=248956422
-Chrom_2_len=242193529
-Chrom_3_len=198295559
-Chrom_4_len=190214555
-Chrom_5_len=181538259
-Chrom_6_len=170805979
-Chrom_7_len=159345973
-Chrom_8_len=145138636
-Chrom_9_len=138394717	
-Chrom_10_len=133797422
-Chrom_11_len=135086622
-Chrom_12_len=133275309
-Chrom_13_len=114364328
-Chrom_14_len=107043718
-Chrom_15_len=101991189
-Chrom_16_len=90338345
-Chrom_17_len=83257441
-Chrom_18_len=80373285
-Chrom_19_len=58617616
-Chrom_20_len=64444167
-Chrom_21_len=46709983
-Chrom_22_len=50818468
-Chrom_X_len=156040895
-Chrom_Y_len=57227415
-Chrom_MT_len=16569
+totalGenomeLength=20412
+Chrom_1_len=2058
+Chrom_2_len=1309
+Chrom_3_len=1078
+Chrom_4_len=752
+Chrom_5_len=876
+Chrom_6_len=1048
+Chrom_7_len=989
+Chrom_8_len=677
+Chrom_9_len=786	
+Chrom_10_len=733
+Chrom_11_len=1298
+Chrom_12_len=1034
+Chrom_13_len=327
+Chrom_14_len=830
+Chrom_15_len=613
+Chrom_16_len=873
+Chrom_17_len=1197
+Chrom_18_len=270
+Chrom_19_len=1472
+Chrom_20_len=544
+Chrom_21_len=234
+Chrom_22_len=488
+Chrom_X_len=842
+Chrom_Y_len=71
+Chrom_MT_len=13
+chromosomeGeneNums= c(Chrom_1_len, Chrom_1_len, Chrom_2_len, Chrom_2_len,
+                      Chrom_3_len, Chrom_3_len, Chrom_4_len, Chrom_4_len,
+                      Chrom_5_len, Chrom_5_len, Chrom_6_len, Chrom_6_len,
+                      Chrom_7_len, Chrom_7_len, Chrom_8_len, Chrom_8_len,
+                      Chrom_9_len, Chrom_9_len, Chrom_10_len, Chrom_10_len,
+                      Chrom_11_len, Chrom_11_len, Chrom_12_len, Chrom_12_len,
+                      Chrom_13_len, Chrom_13_len, Chrom_14_len, Chrom_14_len, Chrom_15_len,
+                      Chrom_15_len, Chrom_16_len, Chrom_16_len, Chrom_17_len,
+                      Chrom_17_len, Chrom_18_len, Chrom_18_len, Chrom_19_len,
+                      Chrom_19_len, Chrom_20_len, Chrom_20_len, Chrom_21_len,
+                      Chrom_21_len, Chrom_22_len, Chrom_22_len, Chrom_X_len,
+                      Chrom_X_len, Chrom_Y_len, Chrom_Y_len, Chrom_MT_len,
+                      Chrom_MT_len)
 mySum = (Chrom_1_len +
            Chrom_2_len +
            Chrom_3_len +
@@ -160,18 +173,17 @@ myDF=data.frame(listChrom, expected, numDiffEx, chiSqVals, pvals)
 
 negLog10P = -log10(pvals)
 myDF=data.frame(myDF, negLog10P)
-noMT=data.frame(myDF[1:24, ])
-noMT$listChrom=as.character(noMT$listChrom)
-noMT$expected=as.character(noMT$expected)
-noMT$numDiffEx=as.character(noMT$numDiffEx)
-noMT$chiSqVals=as.character(noMT$chiSqVals)
-noMT$pvals=as.character(noMT$pvals)
-noMT$listChrom = factor(noMT$listChrom,
+myDF$listChrom=as.character(myDF$listChrom)
+myDF$expected=as.character(myDF$expected)
+myDF$numDiffEx=as.character(myDF$numDiffEx)
+myDF$chiSqVals=as.character(myDF$chiSqVals)
+myDF$pvals=as.character(myDF$pvals)
+myDF$listChrom = factor(myDF$listChrom,
                                    levels=c('1','2','3','4','5','6',
                                             '7','8','9','10','11','12',
                                             '13','14','15','16','17','18',
                                             '19','20','21','22','X','Y','MT'))
-ggplot(noMT, aes(x=factor(listChrom), y=as.numeric(negLog10P)))+
+ggplot(myDF, aes(x=factor(listChrom), y=as.numeric(negLog10P)))+
   geom_col(fill="blue")+
   xlab("Chromosome")+
   ggtitle("Chi-Square Test of Locations of Differentially Expressed Genes")+
@@ -179,3 +191,96 @@ ggplot(noMT, aes(x=factor(listChrom), y=as.numeric(negLog10P)))+
   scale_fill_brewer(palette="Spectral")+
   theme_grey()+
   theme(plot.title = element_text(hjust = 0.5, size=13))
+
+
+counts <- data.frame(myDF$listChrom, as.numeric(myDF$expected), as.numeric(myDF$numDiffEx))
+colnames(counts) <- c("chromosome", "expected", "observed")
+thisChrom <- as.vector(myDF$listChrom)[1]
+expRow <- c(thisChrom, "expected", counts[1, "expected"])
+obsRow <- c(thisChrom, "observed", counts[1, "observed"])
+chartTable=rbind(expRow, obsRow)
+for (i in 2:25){
+  thisChrom <- as.vector(myDF$listChrom)[i]
+  expRow <- c(thisChrom, "expected", counts[i, "expected"])
+  obsRow <- c(thisChrom, "observed", counts[i, "observed"])
+  chartTable=rbind(chartTable, expRow)
+  chartTable=rbind(chartTable, obsRow)
+}
+colnames(chartTable) <- c("chromosome", "condition", "value")
+chartTable=as.data.frame(chartTable)
+chartTable$chromosome=as.character(chartTable$chromosome)
+chartTable$condition=as.character(chartTable$condition)
+chartTable$value=as.numeric(as.character(chartTable$value))
+ggplot(chartTable, aes(fill=condition, y=value, x=chromosome)) + 
+  geom_bar(position="dodge", stat="identity")
+ggplot(chartTable, aes(fill=condition, y=value/chromosomeGeneNums, x=chromosome)) + 
+  geom_bar(position="dodge", stat="identity")
+
+myTrack=BioCircosTracklist() # Initialize Empty BioCircosTracklist
+
+## Add one track for each chromosome
+chromosomes=c("MT")
+
+index=1
+i="MT"
+## Define histogram/bars to be displayed
+nbBars = which(allDiff$chromosome_name==i & allDiff$log2FoldChange<0)
+barValues = allDiff[nbBars,]$log2FoldChange
+barColor = colorRampPalette(brewer.pal(11, "Spectral"))(14)
+## Add a track with bars on the i-th chromosome
+startVec = allDiff[nbBars,]$start_position
+endVec = allDiff[nbBars,]$end_position
+myTrack = myTrack + BioCircosBarTrack(paste0("bars", i),
+                                      chromosome=i,
+                                      starts = startVec,
+                                      ends = endVec,
+                                      values = -1* allDiff[nbBars,]$log2FoldChange,
+                                      color = "#00FF00", 
+                                      minRadius = 0.0,
+                                      maxRadius = 0.9)
+index=index+1
+
+myGenome = list("MT"=16569)
+title=capture.output(cat('Location of Downregulated Genes on the Mitochondrial Chromosome'))
+myTrack = myTrack + BioCircosTextTrack("testText", title, weight = "bolder", 
+                                       x = -1.05, y = -1.3, size="12px")
+BioCircos(myTrack, genome=myGenome, genomeFillColor = "darkblue",
+          chrPad = 0.1, displayGenomeBorder = FALSE, yChr =  FALSE, genomeLabelDisplay=TRUE,
+          genomeTicksScale=1657, genomeTicksLen = 5, genomeLabelTextColor = "#FFFFFF",
+          genomeTicksDisplay = TRUE,  genomeLabelTextSize = 22, width='500px', height='500px')
+
+
+myTrack=BioCircosTracklist() # Initialize Empty BioCircosTracklist
+
+## Add one track for each chromosome
+chromosomes=c("MT")
+
+index=1
+i="MT"
+## Define histogram/bars to be displayed
+nbBars = which(allDiff$chromosome_name==i & allDiff$log2FoldChange>0)
+barValues = allDiff[nbBars,]$log2FoldChange
+barColor = colorRampPalette(brewer.pal(11, "Spectral"))(14)
+## Add a track with bars on the i-th chromosome
+startVec = allDiff[nbBars,]$start_position
+endVec = allDiff[nbBars,]$end_position
+myTrack = myTrack + BioCircosBarTrack(paste0("bars", i),
+                                      chromosome=i,
+                                      starts = startVec,
+                                      ends = endVec,
+                                      values = allDiff[nbBars,]$log2FoldChange,
+                                      color = "red", 
+                                      minRadius = 0.0,
+                                      maxRadius = 0.9)
+index=index+1
+
+myGenome = list("MT"=16569)
+title=capture.output(cat('Location of Upregulated Genes on the Mitochondrial Chromosome'))
+myTrack = myTrack + BioCircosTextTrack("testText", title, weight = "bolder", 
+                                       x = -1.05, y = -1.3, size="12px")
+BioCircos(myTrack, genome=myGenome, genomeFillColor = "darkblue",
+          chrPad = 0.1, displayGenomeBorder = FALSE, yChr =  FALSE, genomeLabelDisplay=TRUE,
+          genomeTicksScale=1657, genomeTicksLen = 5, genomeLabelTextColor = "#FFFFFF",
+          genomeTicksDisplay = TRUE,  genomeLabelTextSize = 22, width='500px', height='500px')
+
+
